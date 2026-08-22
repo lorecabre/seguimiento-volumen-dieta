@@ -32,12 +32,12 @@ h1{font-size:clamp(28px,4vw,42px);margin:0;letter-spacing:-.04em}
 .cal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
 .month-label{font-weight:800;text-transform:capitalize}
 .icon-btn{width:44px;height:44px;border:1px solid var(--border);border-radius:12px;background:#fff;font-size:20px;cursor:pointer}
-.weekdays,.calendar{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.weekdays,.calendar{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;min-width:0}
 .weekdays div{text-align:center;font-size:11px;font-weight:800;color:var(--muted);padding:5px}
 .day{border:0;background:#f1f3f5;border-radius:11px;min-width:0;min-height:48px;padding:0;cursor:pointer;font-weight:700;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px}
 .day.selected{background:var(--accent);color:white}
 .day.today{box-shadow:inset 0 0 0 2px #858b93}
-.day.empty{visibility:hidden}
+.day.empty{visibility:hidden;padding:0;border:0;min-width:0}
 .dot{width:5px;height:5px;border-radius:50%;background:currentColor;opacity:.7}
 .form-title{display:flex;justify-content:space-between;gap:10px;margin-bottom:14px}
 .fields{display:grid;grid-template-columns:1fr 1fr;gap:12px}
@@ -74,7 +74,7 @@ button.danger{border:1px solid #e5c7c7;background:white;color:#9f3434}
 .install{border:1px solid var(--border);background:#fff;min-height:44px;border-radius:12px;padding:10px 14px;font-weight:800;cursor:pointer;display:none}
 .install.visible{display:inline-block}
 .footer-note{color:var(--muted);font-size:12px;margin-top:18px}
-.empty{padding:30px;text-align:center;border:1px dashed #c7cdd3;border-radius:16px;color:var(--muted)}
+.empty-state{padding:30px;text-align:center;border:1px dashed #c7cdd3;border-radius:16px;color:var(--muted)}
 .chart-card{background:#fff;border:1px solid var(--border);border-radius:18px;padding:16px;margin-top:14px}
 .chart-title{font-weight:850;margin-bottom:8px}
 svg{width:100%;height:210px;display:block}
@@ -242,7 +242,7 @@ function avg(rows,id){ const a=rows.map(r=>r[id]).filter(v=>typeof v==='number')
 function fmt(v,d=1){ return v===null ? '—' : v.toLocaleString('es-AR',{maximumFractionDigits:d}); }
 
 function stats(rows){
-  if(!rows.length) return '<div class="empty">No hay datos cargados para este período.</div>';
+  if(!rows.length) return '<div class="empty-state">No hay datos cargados para este período.</div>';
   const metrics=[['weight','Peso','kg',2],['steps','Pasos','',0],['calories','Calorías','kcal',0],['protein','Proteínas','g',1],['carbs','Carbos','g',1],['fat','Grasas','g',1]];
   let h='<div class="stats">';
   metrics.forEach(([id,n,u,d])=>{ const v=avg(rows,id); h+=`<div class="stat"><div class="stat-name">Promedio ${n}</div><div class="stat-val">${fmt(v,d)} <small>${v===null?'':u}</small></div></div>`; });
@@ -285,7 +285,7 @@ Días con datos: ${rows.length}`;
 
 function chart(rows,id){
   const data=rows.filter(r=>typeof r[id]==='number');
-  if(data.length<2) return '<div class="empty">Cargá al menos 2 días para ver la tendencia.</div>';
+  if(data.length<2) return '<div class="empty-state">Cargá al menos 2 días para ver la tendencia.</div>';
   const W=760,H=210,L=48,R=16,T=16,B=28;
   const vals=data.map(r=>r[id]); let min=Math.min(...vals),max=Math.max(...vals); if(min===max){min-=1;max+=1}
   const span=max-min, x=i=>L+i*((W-L-R)/Math.max(1,data.length-1)), y=v=>T+(max-v)*((H-T-B)/span);
@@ -313,7 +313,7 @@ function renderAll(){
 }
 
 function renderHistory(){
-  if(!history.length){ $('historyList').innerHTML='<div class="empty">Todavía no cerraste ninguna semana.</div>'; return; }
+  if(!history.length){ $('historyList').innerHTML='<div class="empty-state">Todavía no cerraste ninguna semana.</div>'; return; }
   $('historyList').innerHTML=history.slice().reverse().map(item=>`<article class="history-item"><div class="history-item-head"><b>${item.label}</b><button class="danger delete-history" data-id="${item.id}" type="button">Eliminar</button></div><p>${item.summary}</p></article>`).join('');
   document.querySelectorAll('.delete-history').forEach(btn=>btn.addEventListener('click',()=>{
     history=history.filter(item=>item.id!==btn.dataset.id); saveHistory(); renderHistory();
