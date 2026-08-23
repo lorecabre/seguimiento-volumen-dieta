@@ -63,6 +63,12 @@ button.danger{border:1px solid #e5c7c7;background:white;color:#9f3434}
 .compare-box b{font-size:19px}
 .good{color:var(--good)} .bad{color:var(--bad)}
 .share{white-space:pre-wrap;background:#eef1f4;border-radius:14px;padding:14px;margin-top:14px;font-size:13px;line-height:1.55}
+.week-notes{margin-top:14px}
+.week-notes-title{font-size:17px;font-weight:850;margin-bottom:10px}
+.week-notes-list{display:grid;gap:8px}
+.week-note{background:#fff;border:1px solid var(--border);border-radius:14px;padding:13px}
+.week-note-date{font-size:12px;font-weight:850;text-transform:capitalize;color:var(--muted);margin-bottom:5px}
+.week-note-text{white-space:pre-wrap;font-size:14px;line-height:1.5}
 .toolbar{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
 .toolbar button,.file-label{border:0;background:var(--soft);color:var(--text);min-height:44px;border-radius:12px;padding:11px 15px;font-weight:800;cursor:pointer;display:inline-flex;align-items:center}
 .toolbar .primary-action{background:var(--accent);color:var(--accentText)}
@@ -142,6 +148,7 @@ svg{width:100%;height:210px;display:block}
 <section id="week" class="view">
   <div class="summary-head"><div><div class="summary-title">Resumen semanal</div><div id="weekRange" class="muted"></div></div></div>
   <div id="weekStats"></div>
+  <div id="weekNotes" class="week-notes"></div>
   <div class="toolbar">
     <button id="closeWeek" class="primary-action" type="button">Cerrar semana</button>
     <button id="copyWeek" type="button">Copiar resumen</button>
@@ -194,6 +201,8 @@ function parts(d){ return {y:d.getUTCFullYear(),m:d.getUTCMonth(),d:d.getUTCDate
 function fmtDate(o){ return new Intl.DateTimeFormat('es-AR',{weekday:'long',day:'numeric',month:'long',year:'numeric',timeZone:'UTC'}).format(utcDate(o)); }
 function fmtMonth(y,m){ return new Intl.DateTimeFormat('es-AR',{month:'long',year:'numeric',timeZone:'UTC'}).format(new Date(Date.UTC(y,m,1))); }
 function fmtShort(d){ return new Intl.DateTimeFormat('es-AR',{weekday:'short',day:'numeric',month:'short',timeZone:'UTC'}).format(d).replaceAll('.','').replace(',',''); }
+function fmtNoteDate(d){ return new Intl.DateTimeFormat('es-AR',{weekday:'long',day:'numeric',month:'long',timeZone:'UTC'}).format(d); }
+function escapeHtml(value){ return String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
 function renderCalendar(){
   $('monthLabel').textContent = fmtMonth(shown.y,shown.m);
@@ -269,8 +278,15 @@ function weekComparison(cur,prev){
     return `<div class="compare-box"><div class="muted">vs semana anterior · ${name}</div><b class="${diff===null?'':diff>0?'good':diff<0?'bad':''}">${diff===null?'—':(diff>0?'+':'')+diff.toFixed(d)+' '+unit}</b></div>`;
   }).join('')+'</div>';
 }
+function weekNotes(rows){
+  const notes=rows.filter(r=>typeof r.notes==='string' && r.notes.trim());
+  if(!notes.length) return '<div class="week-notes-title">Anotaciones de la semana</div><div class="empty-state">No hay anotaciones para esta semana.</div>';
+  return `<div class="week-notes-title">Anotaciones de la semana</div><div class="week-notes-list">${notes.map(r=>`<article class="week-note"><div class="week-note-date">${escapeHtml(fmtNoteDate(r.date))}</div><div class="week-note-text">${escapeHtml(r.notes)}</div></article>`).join('')}</div>`;
+}
 function shareText(rows,s,e){
   const a=id=>avg(rows,id), alc=rows.map(r=>r.alcohol).filter(v=>typeof v==='number');
+  const notes=rows.filter(r=>typeof r.notes==='string' && r.notes.trim());
+  const notesText=notes.length ? `\n\nANOTACIONES\n${notes.map(r=>`${fmtNoteDate(r.date)}: ${r.notes}`).join('\n')}` : '\n\nANOTACIONES\nSin anotaciones.';
   return `RESUMEN SEMANAL · ${fmtShort(s)} al ${fmtShort(e)}
 
 Peso promedio: ${fmt(a('weight'),2)} kg
@@ -280,7 +296,7 @@ Proteínas promedio: ${fmt(a('protein'),1)} g
 Carbos promedio: ${fmt(a('carbs'),1)} g
 Grasas promedio: ${fmt(a('fat'),1)} g
 Alcohol: ${alc.reduce((x,y)=>x+y,0).toLocaleString('es-AR',{maximumFractionDigits:1})} copas en ${alc.filter(v=>v>0).length} días
-Días con datos: ${rows.length}`;
+Días con datos: ${rows.length}${notesText}`;
 }
 
 function chart(rows,id){
@@ -299,6 +315,7 @@ function renderAll(){
   const w=weekData(), p=prevWeekData();
   $('weekRange').textContent=`${fmtShort(w.s)} — ${fmtShort(w.e)}`;
   $('weekStats').innerHTML=stats(w.rows)+weekComparison(w.rows,p.rows);
+  $('weekNotes').innerHTML=weekNotes(w.rows);
   $('weekShare').textContent=shareText(w.rows,w.s,w.e);
 
   const ms=new Date(Date.UTC(selected.y,selected.m,1)), me=new Date(Date.UTC(selected.y,selected.m+1,0));

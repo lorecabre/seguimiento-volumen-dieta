@@ -3,7 +3,7 @@
   "short_name": "Seguimiento",
   "description": "Registro personal de peso, alimentación, pasos y tendencias.",
   "lang": "es-AR",
-  "start_url": "./?v=5",
+  "start_url": "./?v=6",
   "scope": "./",
   "display": "standalone",
   "background_color": "#f4f6f8",
