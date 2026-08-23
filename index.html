@@ -108,7 +108,7 @@ svg{width:100%;height:210px;display:block}
         <div id="monthLabel" class="month-label"></div>
         <button id="nextMonth" class="icon-btn">›</button>
       </div>
-      <div class="weekdays"><div>L</div><div>M</div><div>X</div><div>J</div><div>V</div><div>S</div><div>D</div></div>
+      <div class="weekdays"><div>D</div><div>L</div><div>M</div><div>X</div><div>J</div><div>V</div><div>S</div></div>
       <div id="calendar" class="calendar"></div>
     </div>
     <div class="card">
@@ -193,13 +193,13 @@ function utcDate(o){ return new Date(Date.UTC(o.y,o.m,o.d)); }
 function parts(d){ return {y:d.getUTCFullYear(),m:d.getUTCMonth(),d:d.getUTCDate()}; }
 function fmtDate(o){ return new Intl.DateTimeFormat('es-AR',{weekday:'long',day:'numeric',month:'long',year:'numeric',timeZone:'UTC'}).format(utcDate(o)); }
 function fmtMonth(y,m){ return new Intl.DateTimeFormat('es-AR',{month:'long',year:'numeric',timeZone:'UTC'}).format(new Date(Date.UTC(y,m,1))); }
-function fmtShort(d){ return new Intl.DateTimeFormat('es-AR',{day:'numeric',month:'short',timeZone:'UTC'}).format(d); }
+function fmtShort(d){ return new Intl.DateTimeFormat('es-AR',{weekday:'short',day:'numeric',month:'short',timeZone:'UTC'}).format(d).replaceAll('.','').replace(',',''); }
 
 function renderCalendar(){
   $('monthLabel').textContent = fmtMonth(shown.y,shown.m);
   const cal = $('calendar'); cal.innerHTML='';
   const first = new Date(Date.UTC(shown.y,shown.m,1));
-  const offset = (first.getUTCDay()+6)%7;
+  const offset = first.getUTCDay();
   const days = new Date(Date.UTC(shown.y,shown.m+1,0)).getUTCDate();
   for(let i=0;i<offset;i++){ const e=document.createElement('div'); e.className='day empty'; cal.appendChild(e); }
   for(let d=1; d<=days; d++){
@@ -232,7 +232,7 @@ $('deleteDay').addEventListener('click',()=>{
   if(store[key(selected)]){ delete store[key(selected)]; saveStore(); loadForm(); renderCalendar(); renderAll(); $('message').textContent='Día eliminado.'; }
 });
 
-function monday(o){ const d=utcDate(o); const n=(d.getUTCDay()+6)%7; d.setUTCDate(d.getUTCDate()-n); return d; }
+function sundayOf(o){ const d=utcDate(o); d.setUTCDate(d.getUTCDate()-d.getUTCDay()); return d; }
 function range(start,end){
   const rows=[]; const d=new Date(start);
   while(d<=end){ const k=key(parts(d)); if(store[k]) rows.push({date:new Date(d),...store[k]}); d.setUTCDate(d.getUTCDate()+1); }
@@ -259,7 +259,7 @@ function stats(rows){
   </div>`;
   return h;
 }
-function weekData(){ const s=monday(selected), e=new Date(s); e.setUTCDate(e.getUTCDate()+6); return {s,e,rows:range(s,e)}; }
+function weekData(){ const s=sundayOf(selected), e=new Date(s); e.setUTCDate(e.getUTCDate()+6); return {s,e,rows:range(s,e)}; }
 function prevWeekData(){ const w=weekData(), e=new Date(w.s); e.setUTCDate(e.getUTCDate()-1); const s=new Date(e); s.setUTCDate(s.getUTCDate()-6); return {s,e,rows:range(s,e)}; }
 
 function weekComparison(cur,prev){
