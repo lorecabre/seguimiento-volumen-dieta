@@ -148,7 +148,7 @@ h1{font-size:29px}
     <div id="monthLabel" class="month-label"></div>
     <button id="nextMonth" class="icon-btn" type="button">›</button>
    </div>
-   <div class="weekdays"><div>L</div><div>M</div><div>X</div><div>J</div><div>V</div><div>S</div><div>D</div></div>
+   <div class="weekdays"><div>D</div><div>L</div><div>M</div><div>X</div><div>J</div><div>V</div><div>S</div></div>
    <div id="calendar" class="calendar"></div>
   </div>
   <div class="card">
@@ -257,7 +257,7 @@ function fmt(v,d=1){return v===null?'—':v.toLocaleString('es-AR',{maximumFract
 
 function renderCalendar(){
  $('monthLabel').textContent=fmtMonth(shown.y,shown.m);const cal=$('calendar');cal.innerHTML='';
- const first=new Date(Date.UTC(shown.y,shown.m,1));const offset=(first.getUTCDay()+6)%7;const days=new Date(Date.UTC(shown.y,shown.m+1,0)).getUTCDate();
+ const first=new Date(Date.UTC(shown.y,shown.m,1));const offset=first.getUTCDay();const days=new Date(Date.UTC(shown.y,shown.m+1,0)).getUTCDate();
  for(let i=0;i<offset;i++){const e=document.createElement('div');e.className='day empty';cal.appendChild(e)}
  for(let d=1;d<=days;d++){
   const o={y:shown.y,m:shown.m,d};const b=document.createElement('button');b.type='button';b.className='day';
@@ -277,13 +277,13 @@ $('entryForm').addEventListener('submit',e=>{
 $('clearForm').addEventListener('click',()=>{fields.forEach(f=>$(f).value='');$('message').textContent='Formulario limpio. Los datos guardados no cambiaron.'});
 $('deleteDay').addEventListener('click',()=>{if(store[key(selected)]){delete store[key(selected)];saveAll();loadForm();renderCalendar();renderAll();$('message').textContent='Día eliminado.'}});
 
-function monday(o){const d=utcDate(o),n=(d.getUTCDay()+6)%7;d.setUTCDate(d.getUTCDate()-n);return d}
+function sunday(o){const d=utcDate(o),n=d.getUTCDay();d.setUTCDate(d.getUTCDate()-n);return d}
 function range(start,end){const rows=[],d=new Date(start);while(d<=end){const k=key(parts(d));if(store[k])rows.push({date:new Date(d),...store[k]});d.setUTCDate(d.getUTCDate()+1)}return rows}
 function avg(rows,id){const a=rows.map(r=>r[id]).filter(v=>typeof v==='number');return a.length?a.reduce((x,y)=>x+y,0)/a.length:null}
 
 
 function weeklyDailyTable(start,end){
- const names=['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'];
+ const names=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
  const rows=[];const d=new Date(start);let i=0;
  while(d<=end&&i<7){
    const r=store[key(parts(d))]||{};
@@ -308,7 +308,7 @@ function stats(rows){
  <div class="compare-box"><div class="muted">Alcohol</div><b>${total.toLocaleString('es-AR',{maximumFractionDigits:1})} copas</b><div class="muted">${days} días</div></div>
  <div class="compare-box"><div class="muted">Kcal de alcohol</div><b>${alcKcal.toLocaleString('es-AR')} kcal</b></div></div>`
 }
-function weekData(){const s=monday(selected),e=new Date(s);e.setUTCDate(e.getUTCDate()+6);return{s,e,rows:range(s,e)}}
+function weekData(){const s=sunday(selected),e=new Date(s);e.setUTCDate(e.getUTCDate()+6);return{s,e,rows:range(s,e)}}
 function previousWeek(){const w=weekData(),e=new Date(w.s);e.setUTCDate(e.getUTCDate()-1);const s=new Date(e);s.setUTCDate(s.getUTCDate()-6);return{s,e,rows:range(s,e)}}
 function comparison(cur,prev,label){
  const items=[['Peso promedio','weight','kg',2],['Calorías promedio','calories','kcal',0],['Pasos promedio','steps','',0],['Proteínas','protein','g',1],['Carbos','carbs','g',1],['Grasas','fat','g',1]];
@@ -316,7 +316,7 @@ function comparison(cur,prev,label){
 }
 function shareText(rows,s,e){
  const a=id=>avg(rows,id),alc=rows.map(r=>r.alcohol).filter(v=>typeof v==='number');
- const names=['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];const detail=[];const d=new Date(s);
+ const names=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];const detail=[];const d=new Date(s);
  for(let i=0;i<7;i++){const r=store[key(parts(d))]||{};const show=(id,digits=1)=>typeof r[id]==='number'?r[id].toLocaleString('es-AR',{maximumFractionDigits:digits}):'—';detail.push(`${names[i]} ${fmtShort(d)} | Peso ${show('weight',2)} kg | Pasos ${show('steps',0)} | Kcal ${show('calories',0)} | P ${show('protein',1)} g | C ${show('carbs',1)} g | G ${show('fat',1)} g | Alcohol ${show('alcohol',1)}`);d.setUTCDate(d.getUTCDate()+1)}
  return `RESUMEN SEMANAL · ${fmtShort(s)} al ${fmtShort(e)}
 
