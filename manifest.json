@@ -1,14 +1,9 @@
 {
   "name": "Seguimiento de volumen y dieta",
-  "short_name": "Seguimiento",
-  "description": "Registro personal de peso, alimentación, pasos y tendencias.",
-  "lang": "es-AR",
-  "start_url": "./?v=6",
-  "scope": "./",
+  "short_name": "Volumen y dieta",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#f4f6f8",
   "theme_color": "#24282e",
-  "icons": [
-    {"src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable"}
-  ]
+  "description": "Seguimiento diario, semanal y mensual de peso, pasos, calorías, macros y alcohol."
 }
