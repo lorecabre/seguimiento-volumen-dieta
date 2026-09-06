@@ -39,7 +39,7 @@ h1{font-size:clamp(28px,4vw,42px);margin:0;letter-spacing:-.04em}
 .form-title{display:flex;justify-content:space-between;gap:10px;margin-bottom:14px}
 .fields{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 label{display:block;font-size:12px;font-weight:800;color:#555e68;margin-bottom:5px}
-input,textarea{width:100%;border:1px solid #d6dbe0;background:#fbfcfd;border-radius:11px;padding:11px;font-size:16px;min-height:44px}
+input,textarea,select{width:100%;border:1px solid #d6dbe0;background:#fbfcfd;border-radius:11px;padding:11px;font-size:16px;min-height:44px}
 textarea{resize:vertical;min-height:78px}
 .full{grid-column:1/-1}
 .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
@@ -72,6 +72,14 @@ svg{width:100%;height:210px;display:block}
 .history-head{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:8px}
 .file-input{display:none}
 .install-note{background:#fff;border:1px solid var(--border);border-radius:16px;padding:14px;margin-top:14px}
+.section-block{grid-column:1/-1;margin-top:2px}
+.section-label{font-size:13px;font-weight:850;margin:2px 0 8px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.status-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:10px}
+.status-pill{display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border-radius:999px;background:#eef1f4;font-size:12px;font-weight:800}
+.status-pill.closed{background:#e5f2e9;color:#2f6d43}
+.day.closed{box-shadow:inset 0 0 0 2px #5d8f6b}
+.day.closed .dot{width:7px;height:7px;background:#5d8f6b;opacity:1}
+.daily-note{font-size:12px;color:var(--muted);margin-top:6px}
 @media(max-width:860px){.grid{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}.compare{grid-template-columns:1fr}}
 @media(max-width:480px){
 .app{padding:8px 10px 28px}
@@ -110,6 +118,12 @@ h1{font-size:32px;line-height:1.08}
 .week-table .missing{color:#a1a7ae}
 .week-section-title{font-size:18px;font-weight:850;margin:18px 0 10px}
 
+@media(max-width:480px){
+.section-label{font-size:12px}
+.status-row{margin-top:8px}
+.status-pill{font-size:11px;padding:6px 9px}
+select{font-size:16px}
+}
 @media(max-width:370px){
 .app{padding-left:7px;padding-right:7px}
 .card{padding:10px}
@@ -155,7 +169,12 @@ h1{font-size:29px}
    <div class="form-title"><div><h2>Cargar datos</h2><div id="dateLabel" class="muted"></div></div><div class="muted">Vacío = no cuenta</div></div>
    <form id="entryForm">
     <div class="fields">
+     <div class="section-block"><div class="section-label">Mañana</div></div>
      <div><label for="weight">Peso (kg)</label><input id="weight" type="number" step="0.01" min="20" max="300"></div>
+     <div><label for="sleep">Sueño percibido (1–5)</label>
+       <select id="sleep"><option value="">—</option><option value="1">1 · Muy malo</option><option value="2">2 · Malo</option><option value="3">3 · Regular</option><option value="4">4 · Bueno</option><option value="5">5 · Muy bueno</option></select>
+     </div>
+     <div class="section-block"><div class="section-label">Durante / final del día</div></div>
      <div><label for="steps">Pasos</label><input id="steps" type="number" step="1" min="0"></div>
      <div><label for="calories">Calorías (kcal)</label><input id="calories" type="number" step="1" min="0"></div>
      <div><label for="protein">Proteínas (g)</label><input id="protein" type="number" step="0.1" min="0"></div>
@@ -163,14 +182,17 @@ h1{font-size:29px}
      <div><label for="fat">Grasas (g)</label><input id="fat" type="number" step="0.1" min="0"></div>
      <div><label for="alcohol">Alcohol (copas)</label><input id="alcohol" type="number" step="0.5" min="0"></div>
      <div><label for="alcoholCalories">Kcal de alcohol</label><input id="alcoholCalories" type="number" step="1" min="0"></div>
-     <div class="full"><label for="notes">Notas</label><textarea id="notes" placeholder="Ej. cena afuera, viaje, entrenamiento de piernas..."></textarea></div>
+     <div><label for="energy">Energía (1–5)</label><select id="energy"><option value="">—</option><option value="1">1 · Muy baja</option><option value="2">2 · Baja</option><option value="3">3 · Media</option><option value="4">4 · Buena</option><option value="5">5 · Muy buena</option></select></div>
+     <div><label for="hunger">Hambre (1–5)</label><select id="hunger"><option value="">—</option><option value="1">1 · Muy baja</option><option value="2">2 · Baja</option><option value="3">3 · Media</option><option value="4">4 · Alta</option><option value="5">5 · Muy alta</option></select></div>
+     <div><label for="stress">Estrés (1–5)</label><select id="stress"><option value="">—</option><option value="1">1 · Muy bajo</option><option value="2">2 · Bajo</option><option value="3">3 · Medio</option><option value="4">4 · Alto</option><option value="5">5 · Muy alto</option></select></div>
+     <div class="full"><label for="notes">Notas</label><textarea id="notes" placeholder="Ej. sueño malo, reloj flojo, cena afuera, viaje, menstruación, entrenamiento de piernas..."></textarea></div>
     </div>
     <div class="actions">
-     <button class="primary flex1" type="submit">Guardar día</button>
+     <button class="primary flex1" type="submit">Guardar parcial</button><button class="secondary" type="button" id="closeDay">Cerrar día</button>
      <button class="secondary" type="button" id="clearForm">Limpiar</button>
      <button class="danger" type="button" id="deleteDay">Borrar</button>
     </div>
-    <div id="message" class="message"></div>
+    <div id="message" class="message"></div><div class="status-row"><span id="dayStatus" class="status-pill">Día abierto</span></div><div class="daily-note">Podés guardar varias veces durante el día. “Cerrar día” lo marca como completo.</div>
    </form>
   </div>
  </div>
@@ -243,7 +265,7 @@ try{closedWeeks=JSON.parse(localStorage.getItem(CLOSED_KEY)||'[]')}catch{closedW
 const today=new Date();
 let selected={y:today.getFullYear(),m:today.getMonth(),d:today.getDate()};
 let shown={y:selected.y,m:selected.m};
-const fields=['weight','steps','calories','protein','carbs','fat','alcohol','alcoholCalories','notes'];
+const fields=['weight','sleep','steps','calories','protein','carbs','fat','alcohol','alcoholCalories','energy','hunger','stress','notes'];
 const $=id=>document.getElementById(id);
 
 function saveAll(){localStorage.setItem(DATA_KEY,JSON.stringify(store));localStorage.setItem(CLOSED_KEY,JSON.stringify(closedWeeks))}
@@ -263,19 +285,44 @@ function renderCalendar(){
   const o={y:shown.y,m:shown.m,d};const b=document.createElement('button');b.type='button';b.className='day';
   if(key(o)===key(selected))b.classList.add('selected');
   if(o.y===today.getFullYear()&&o.m===today.getMonth()&&o.d===today.getDate())b.classList.add('today');
+  if(store[key(o)]&&store[key(o)].closed)b.classList.add('closed');
   b.innerHTML=`<span>${d}</span>${store[key(o)]?'<span class="dot"></span>':''}`;
   b.addEventListener('click',()=>{selected=o;loadForm();renderCalendar();renderAll()});cal.appendChild(b)
  }
 }
-function loadForm(){const data=store[key(selected)]||{};$('dateLabel').textContent=fmtDate(selected);fields.forEach(f=>$(f).value=data[f]??'');$('message').textContent=store[key(selected)]?'Datos guardados para este día.':'Todavía no cargaste datos para este día.'}
+function loadForm(){
+ const data=store[key(selected)]||{};
+ $('dateLabel').textContent=fmtDate(selected);
+ fields.forEach(f=>$(f).value=data[f]??'');
+ $('message').textContent=store[key(selected)]?'Datos guardados para este día.':'Todavía no cargaste datos para este día.';
+ const closed=!!data.closed;
+ $('dayStatus').textContent=closed?'Día cerrado':'Día abierto';
+ $('dayStatus').classList.toggle('closed',closed);
+ $('closeDay').textContent=closed?'Reabrir día':'Cerrar día';
+}
 $('entryForm').addEventListener('submit',e=>{
- e.preventDefault();const obj={};let any=false;
- fields.forEach(f=>{if(f==='notes'){const v=$(f).value.trim();if(v){obj[f]=v;any=true}}else if($(f).value!==''){const v=Number($(f).value);if(Number.isFinite(v)){obj[f]=Math.max(0,v);any=true}}});
+ e.preventDefault();
+ const previous=store[key(selected)]||{};
+ const obj={closed:!!previous.closed};
+ let any=false;
+ fields.forEach(f=>{
+   if(f==='notes'){const v=$(f).value.trim();if(v){obj[f]=v;any=true}}
+   else if($(f).value!==''){const v=Number($(f).value);if(Number.isFinite(v)){obj[f]=Math.max(0,v);any=true}}
+ });
  if(!any){$('message').textContent='Cargá al menos un dato.';return}
- store[key(selected)]=obj;saveAll();renderCalendar();renderAll();$('message').textContent='✓ Día guardado.'
+ store[key(selected)]=obj;
+ saveAll();renderCalendar();renderAll();loadForm();
+ $('message').textContent='✓ Datos parciales guardados.';
 });
 $('clearForm').addEventListener('click',()=>{fields.forEach(f=>$(f).value='');$('message').textContent='Formulario limpio. Los datos guardados no cambiaron.'});
 $('deleteDay').addEventListener('click',()=>{if(store[key(selected)]){delete store[key(selected)];saveAll();loadForm();renderCalendar();renderAll();$('message').textContent='Día eliminado.'}});
+$('closeDay').addEventListener('click',()=>{
+ const k=key(selected);
+ if(!store[k]){$('message').textContent='Guardá al menos un dato antes de cerrar el día.';return}
+ store[k].closed=!store[k].closed;
+ saveAll();loadForm();renderCalendar();renderAll();
+ $('message').textContent=store[k].closed?'✓ Día cerrado.':'Día reabierto.';
+});
 
 function sunday(o){const d=utcDate(o),n=d.getUTCDay();d.setUTCDate(d.getUTCDate()-n);return d}
 function range(start,end){const rows=[],d=new Date(start);while(d<=end){const k=key(parts(d));if(store[k])rows.push({date:new Date(d),...store[k]});d.setUTCDate(d.getUTCDate()+1)}return rows}
@@ -284,19 +331,30 @@ function avg(rows,id){const a=rows.map(r=>r[id]).filter(v=>typeof v==='number');
 
 function weeklyDailyTable(start,end){
  const names=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
- const rows=[];const d=new Date(start);let i=0;
- while(d<=end&&i<7){
+ const rows=[]; const d=new Date(start); let i=0;
+ while(d<=end && i<7){
    const r=store[key(parts(d))]||{};
-   const cell=(id,digits=1,unit='')=>{const v=r[id];if(typeof v!=='number')return '<span class="missing">—</span>';return `${v.toLocaleString('es-AR',{maximumFractionDigits:digits})}${unit}`};
-   rows.push(`<tr><td><span class="day-name">${names[i]}</span><span class="date-small">${fmtShort(d)}</span></td><td>${cell('weight',2,' kg')}</td><td>${cell('steps',0)}</td><td>${cell('calories',0)}</td><td>${cell('protein',1)}</td><td>${cell('carbs',1)}</td><td>${cell('fat',1)}</td><td>${cell('alcohol',1)}</td></tr>`);
+   const cell=(id,digits=1,unit='')=>{
+     const v=r[id];
+     if(typeof v!=='number')return '<span class="missing">—</span>';
+     return `${v.toLocaleString('es-AR',{maximumFractionDigits:digits})}${unit}`;
+   };
+   rows.push(`<tr>
+     <td><span class="day-name">${names[i]}</span><span class="date-small">${fmtShort(d)}</span></td>
+     <td>${cell('weight',2,' kg')}</td><td>${cell('sleep',0)}</td><td>${cell('steps',0)}</td><td>${cell('calories',0)}</td>
+     <td>${cell('protein',1)}</td><td>${cell('carbs',1)}</td><td>${cell('fat',1)}</td><td>${cell('alcohol',1)}</td>
+     <td>${cell('energy',0)}</td><td>${cell('hunger',0)}</td><td>${cell('stress',0)}</td><td>${r.closed?'Cerrado':'Abierto'}</td>
+   </tr>`);
    d.setUTCDate(d.getUTCDate()+1);i++;
  }
- return `<div class="week-table-wrap"><table class="week-table"><thead><tr><th>Día</th><th>Peso</th><th>Pasos</th><th>Kcal</th><th>Protes (g)</th><th>Carbos (g)</th><th>Grasas (g)</th><th>Alcohol</th></tr></thead><tbody>${rows.join('')}</tbody></table></div>`;
+ return `<div class="week-table-wrap"><table class="week-table">
+ <thead><tr><th>Día</th><th>Peso</th><th>Sueño</th><th>Pasos</th><th>Kcal</th><th>Protes</th><th>Carbos</th><th>Grasas</th><th>Alcohol</th><th>Energía</th><th>Hambre</th><th>Estrés</th><th>Estado</th></tr></thead>
+ <tbody>${rows.join('')}</tbody></table></div>`;
 }
 
 function stats(rows){
  if(!rows.length)return '<div class="empty">No hay datos cargados para este período.</div>';
- const metrics=[['weight','Peso','kg',2],['steps','Pasos','',0],['calories','Calorías','kcal',0],['protein','Proteínas','g',1],['carbs','Carbos','g',1],['fat','Grasas','g',1]];
+ const metrics=[['weight','Peso','kg',2],['sleep','Sueño','/5',1],['steps','Pasos','',0],['calories','Calorías','kcal',0],['protein','Proteínas','g',1],['carbs','Carbos','g',1],['fat','Grasas','g',1],['energy','Energía','/5',1],['hunger','Hambre','/5',1],['stress','Estrés','/5',1]];
  let h='<div class="stats">';
  metrics.forEach(([id,n,u,d])=>{const v=avg(rows,id);h+=`<div class="stat"><div class="stat-name">Promedio ${n}</div><div class="stat-val">${fmt(v,d)} <small>${v===null?'':u}</small></div></div>`});
  h+='</div>';
@@ -316,8 +374,13 @@ function comparison(cur,prev,label){
 }
 function shareText(rows,s,e){
  const a=id=>avg(rows,id),alc=rows.map(r=>r.alcohol).filter(v=>typeof v==='number');
- const names=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];const detail=[];const d=new Date(s);
- for(let i=0;i<7;i++){const r=store[key(parts(d))]||{};const show=(id,digits=1)=>typeof r[id]==='number'?r[id].toLocaleString('es-AR',{maximumFractionDigits:digits}):'—';detail.push(`${names[i]} ${fmtShort(d)} | Peso ${show('weight',2)} kg | Pasos ${show('steps',0)} | Kcal ${show('calories',0)} | P ${show('protein',1)} g | C ${show('carbs',1)} g | G ${show('fat',1)} g | Alcohol ${show('alcohol',1)}`);d.setUTCDate(d.getUTCDate()+1)}
+ const names=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb']; const detail=[]; const d=new Date(s);
+ for(let i=0;i<7;i++){
+   const r=store[key(parts(d))]||{};
+   const show=(id,digits=1)=>typeof r[id]==='number'?r[id].toLocaleString('es-AR',{maximumFractionDigits:digits}):'—';
+   detail.push(`${names[i]} ${fmtShort(d)} | Peso ${show('weight',2)} kg | Sueño ${show('sleep',0)}/5 | Pasos ${show('steps',0)} | Kcal ${show('calories',0)} | P ${show('protein',1)} g | C ${show('carbs',1)} g | G ${show('fat',1)} g | Alcohol ${show('alcohol',1)} | Energía ${show('energy',0)}/5 | Hambre ${show('hunger',0)}/5 | Estrés ${show('stress',0)}/5 | ${r.closed?'Cerrado':'Abierto'}`);
+   d.setUTCDate(d.getUTCDate()+1);
+ }
  return `RESUMEN SEMANAL · ${fmtShort(s)} al ${fmtShort(e)}
 
 DETALLE DIARIO
@@ -325,11 +388,15 @@ ${detail.join('\n')}
 
 PROMEDIOS SEMANALES
 Peso promedio: ${fmt(a('weight'),2)} kg
+Sueño promedio: ${fmt(a('sleep'),1)}/5
 Pasos promedio: ${fmt(a('steps'),0)}
 Calorías promedio: ${fmt(a('calories'),0)} kcal
 Proteínas promedio: ${fmt(a('protein'),1)} g
 Carbos promedio: ${fmt(a('carbs'),1)} g
 Grasas promedio: ${fmt(a('fat'),1)} g
+Energía promedio: ${fmt(a('energy'),1)}/5
+Hambre promedio: ${fmt(a('hunger'),1)}/5
+Estrés promedio: ${fmt(a('stress'),1)}/5
 Alcohol total: ${alc.reduce((x,y)=>x+y,0).toLocaleString('es-AR',{maximumFractionDigits:1})} copas en ${alc.filter(v=>v>0).length} días
 Días con datos: ${rows.length}`
 }
